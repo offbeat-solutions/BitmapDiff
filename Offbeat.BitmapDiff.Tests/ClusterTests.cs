@@ -18,8 +18,7 @@ namespace Offbeat.BitmapDiff.Tests
             };
 
             var result = BitmapDiffer.Cluster(points, new DifferenceClusteringOptions() {
-                GroupingPadding = 0,
-                GroupingThreshold = 1
+                ClusteringThreshold = 1
             });
 
             Assert.Equal(2, result.Count);
@@ -35,8 +34,7 @@ namespace Offbeat.BitmapDiff.Tests
             };
 
             var result = BitmapDiffer.Cluster(points, new DifferenceClusteringOptions() {
-                GroupingPadding = 0,
-                GroupingThreshold = 1
+                ClusteringThreshold = 1
             });
 
             Assert.Equal(1, result.Count);
@@ -51,8 +49,7 @@ namespace Offbeat.BitmapDiff.Tests
             };
 
             var result = BitmapDiffer.Cluster(points, new DifferenceClusteringOptions() {
-                GroupingPadding = 0,
-                GroupingThreshold = 2
+                ClusteringThreshold = 2
             });
 
             Assert.Equal(1, result.Count);
@@ -73,8 +70,7 @@ namespace Offbeat.BitmapDiff.Tests
             };
 
             var result = BitmapDiffer.Cluster(points, new DifferenceClusteringOptions() {
-                GroupingPadding = 0,
-                GroupingThreshold = 2
+                ClusteringThreshold = 2
             });
 
             Assert.Equal(2, result.Count);
@@ -92,8 +88,7 @@ namespace Offbeat.BitmapDiff.Tests
             };
 
             var result = BitmapDiffer.Cluster(points, new DifferenceClusteringOptions() {
-                GroupingPadding = 0,
-                GroupingThreshold = 2
+                ClusteringThreshold = 2
             });
 
             Assert.Equal(1, result.Count);
@@ -117,8 +112,7 @@ namespace Offbeat.BitmapDiff.Tests
             };
 
             var result = BitmapDiffer.Cluster(points, new DifferenceClusteringOptions() {
-                GroupingPadding = 0,
-                GroupingThreshold = 1
+                ClusteringThreshold = 1
             });
 
             Assert.Equal(1, result.Count);
