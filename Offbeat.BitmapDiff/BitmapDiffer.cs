@@ -9,10 +9,25 @@ using System.Runtime.CompilerServices;
 namespace Offbeat.BitmapDiff {
     public static class BitmapDiffer
     {
+        private static readonly ImageCompareOptions DefaultCompareOptions = new ImageCompareOptions();
+
+        /// <summary>
+        /// Compares two bitmaps, producing a list of points where they differ.
+        /// </summary>
+        /// <param name="first">First image to compare</param>
+        /// <param name="second">Second image to compare</param>
+        /// <param name="options">Options for comparing the image</param>
+        /// <returns>A list of Points representing the differences in the images.</returns>
+        /// <remarks>
+        /// Use <paramref name="options"/> to control memory allocation behavior.
+        /// <see cref="ImageCompareOptions.AssumedDifferencePercentage"/> is used to allocate the difference list.
+        /// If your images are likely to be very dissimilar, setting the percentage to a higher value will avoid
+        /// allocations from resizing the list.
+        /// </remarks>
         public static IList<Point> Compare(
             Bitmap first, 
             Bitmap second, 
-            ImageCompareOptions options) {
+            ImageCompareOptions options = null) {
             if (first == second) {
                 return new Point[0];
             }
@@ -21,13 +36,16 @@ namespace Offbeat.BitmapDiff {
                 throw new ArgumentException("Second image does not match dimensions of first image", nameof(second));
             }
 
-            if (options.AssumedDifferencePercentage > 100) {
+            if (options?.AssumedDifferencePercentage > 100) {
                 throw new ArgumentException($"Assumed difference percentage must be between 1 and 100 (was: {options.AssumedDifferencePercentage})");
             }
 
+            double assumedDifference = options?.AssumedDifferencePercentage ??
+                DefaultCompareOptions.AssumedDifferencePercentage;
+
             // Construct the difference list with a specific assumed size to minimize list allocations.
             int diffListDesiredSize =
-                (int) Math.Floor(first.Width * first.Height * (options.AssumedDifferencePercentage / 100));
+                (int) Math.Floor(first.Width * first.Height * (assumedDifference / 100));
             var differences =
                 new List<Point>(Math.Max(4, diffListDesiredSize));
 
@@ -61,9 +79,15 @@ namespace Offbeat.BitmapDiff {
             }
         }
 
+        /// <summary>
+        /// Cluster a list of points into containing rectangles. This method is used to generate difference markers.
+        /// </summary>
+        /// <param name="points">The list of points to cluster.</param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public static IList<Rectangle> Cluster(
             IList<Point> points, 
-            DifferenceClusteringOptions opts) {
+            DifferenceClusteringOptions options) {
             if (points.Count == 0) {
                 return new Rectangle[0];
             }
@@ -80,7 +104,9 @@ namespace Offbeat.BitmapDiff {
                     continue;
                 }
 
-                Rectangle matchRectangle = GetMatchRectangle(opts, point);
+                var clusteringThreshold = options.ClusteringThreshold;
+
+                Rectangle matchRectangle = GetMatchRectangle(options.ClusteringThreshold, point);
                 Rectangle joinRectangle = differences[differences.Count - 1];
 
                 int joinRectangleIndex = differences.Count - 1;
@@ -105,7 +131,7 @@ namespace Offbeat.BitmapDiff {
 
                         joinRectangle = matchRectangle = differences[index] = Union(diff, joinRectangle);
 
-                        matchRectangle.Inflate(opts.GroupingThreshold, opts.GroupingThreshold);
+                        matchRectangle.Inflate(clusteringThreshold, clusteringThreshold);
 
                         joinRectangleIndex = index;
 
@@ -114,7 +140,7 @@ namespace Offbeat.BitmapDiff {
                     }
 
                     int bottomEdge = diff.Y + diff.Height - 1;
-                    if (bottomEdge < matchRectangle.X - opts.GroupingThreshold) {
+                    if (bottomEdge < matchRectangle.X - clusteringThreshold) {
                         // Since our list of points is sorted by Y coordinate first,
                         // when we first encounter a Y coordinate that's out of range,
                         // we know we can stop looking
@@ -126,8 +152,7 @@ namespace Offbeat.BitmapDiff {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Rectangle GetMatchRectangle(DifferenceClusteringOptions opts, Point point) {
-            int threshold = opts.GroupingThreshold;
+        private static Rectangle GetMatchRectangle(int threshold, Point point) {
             var rect = new Rectangle(
                 Math.Max(0, point.X - threshold),
                 Math.Max(0, point.Y - threshold),

@@ -1,15 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net462</TargetFramework>
+		<PackageId>Offbeat.BitmapDiff</PackageId>
+		<VersionPrefix>0.1.0</VersionPrefix>
+		<VersionSuffix Condition="'$(PREVIEW_BUILD)' != ''">-preview-$(BUILD_NUMBER)</VersionSuffix>
+		<PackageProjectUrl></PackageProjectUrl>
+		<RepositoryUrl>https://github.com/offbeat-solutions/BitmapDiff</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>bitmap diff</PackageTags>
+		<Copyright>Offbeat Solutions Oy, 2018</Copyright>
+		<PackageLicenseUrl>https://github.com/offbeat-solutions/BitmapDiff/blob/master/LICENSE</PackageLicenseUrl>
+		<Description>A library for generating difference information from bitmaps</Description>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
 </Project>

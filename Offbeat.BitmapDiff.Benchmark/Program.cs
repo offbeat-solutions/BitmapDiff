@@ -43,7 +43,7 @@ namespace Offbeat.BitmapDiff.Benchmark
             stopwatch.Start();
 
             var clusters = BitmapDiffer.Cluster(differences, new DifferenceClusteringOptions() {
-                GroupingThreshold = 10
+                ClusteringThreshold = 10
             });
 
             stopwatch.Stop();
