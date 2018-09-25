@@ -80,27 +80,44 @@ namespace Offbeat.BitmapDiff {
                     continue;
                 }
 
-                var matchRectangle = GetMatchRectangle(opts, point);
-                var joinRectangle = differences[differences.Count - 1];
+                Rectangle matchRectangle = GetMatchRectangle(opts, point);
+                Rectangle joinRectangle = differences[differences.Count - 1];
 
-                // Start from the second-to-last index, because the last one is the one we just added
-                int referenceMatch = differences.Count - 1;
+                int joinRectangleIndex = differences.Count - 1;
 
-                for (var index = differences.Count - 2; index >= 0; index--) {
+                cluster:
+                for (var index = differences.Count - 1; index >= 0; index--) {
+                    if (index == joinRectangleIndex) {
+                        continue;
+                    }
+
                     var diff = differences[index];
 
                     if (matchRectangle.IntersectsWith(diff)) {
-                        var newDifferenceRectangle = Union(diff, joinRectangle);
+                        differences.RemoveAt(joinRectangleIndex);
 
-                        differences[index] = newDifferenceRectangle;
+                        // If we have restarted clustering, we might match to an element that is later
+                        // in the sequence than we are. That means we have to adjust the index, or we'll be
+                        // off by one.
+                        if (joinRectangleIndex <= index) {
+                            index--;
+                        }
 
-                        differences.RemoveAt(referenceMatch);
-
-                        joinRectangle = matchRectangle = newDifferenceRectangle;
+                        joinRectangle = matchRectangle = differences[index] = Union(diff, joinRectangle);
 
                         matchRectangle.Inflate(opts.GroupingThreshold, opts.GroupingThreshold);
 
-                        referenceMatch = index;
+                        joinRectangleIndex = index;
+
+                        // Restart the clustering process using this rectangle as the match
+                        goto cluster;
+                    }
+
+                    int bottomEdge = diff.Y + diff.Height - 1;
+                    if (bottomEdge < matchRectangle.X - opts.GroupingThreshold) {
+                        // Since our list of points is sorted by Y coordinate first,
+                        // when we first encounter a Y coordinate that's out of range,
+                        // we know we can stop looking
                     }
                 }
             }

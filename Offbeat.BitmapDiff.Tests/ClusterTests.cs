@@ -24,8 +24,6 @@ namespace Offbeat.BitmapDiff.Tests
 
             Assert.Equal(2, result.Count);
             Assert.Equal(new Rectangle(1, 1, 1, 1), result[0]);
-            Assert.Equal(new Rectangle(1, 1, 1, 1), result[0]);
-            Assert.Equal(new Rectangle(3, 3, 1, 1), result[1]);
             Assert.Equal(new Rectangle(3, 3, 1, 1), result[1]);
         }
 
@@ -43,7 +41,6 @@ namespace Offbeat.BitmapDiff.Tests
 
             Assert.Equal(1, result.Count);
             Assert.Equal(new Rectangle(1, 1, 2, 2), result[0]);
-            Assert.Equal(new Rectangle(1, 1, 2, 2), result[0]);
         }
 
         [Fact]
@@ -59,7 +56,6 @@ namespace Offbeat.BitmapDiff.Tests
             });
 
             Assert.Equal(1, result.Count);
-            Assert.Equal(new Rectangle(1, 1, 3, 3), result[0]);
             Assert.Equal(new Rectangle(1, 1, 3, 3), result[0]);
         }
 
@@ -83,8 +79,6 @@ namespace Offbeat.BitmapDiff.Tests
 
             Assert.Equal(2, result.Count);
             Assert.Contains(result, r => r == new Rectangle(1, 1, 3, 3));
-            Assert.Contains(result, r => r == new Rectangle(1, 1, 3, 3));
-            Assert.Contains(result, r => r == new Rectangle(6, 6, 1, 2));
             Assert.Contains(result, r => r == new Rectangle(6, 6, 1, 2));
         }
 
@@ -104,7 +98,31 @@ namespace Offbeat.BitmapDiff.Tests
 
             Assert.Equal(1, result.Count);
             Assert.Equal(new Rectangle(1, 1, 5, 3), result[0]);
-            Assert.Equal(new Rectangle(1, 1, 5, 3), result[0]);
+        }
+
+        [Fact]
+        public void Cluster_EarlierNeighboringClusterExpandsToIntersect_ReturnsOneCluster() {
+            var points = new List<Point>() {
+                // Cluster 1
+                new Point(1, 2),
+
+                // Cluster 2. Note: the starting point of this cluster sorts to an earlier position, so this becomes
+                // the first cluster. A naive implementation will group all these points into a single cluster
+                // but not notice that it expands to cover the first cluster, too.
+                new Point(5, 1),
+                new Point(4, 2),
+                new Point(3, 3),
+                new Point(2, 4),
+                new Point(1, 5),
+            };
+
+            var result = BitmapDiffer.Cluster(points, new DifferenceClusteringOptions() {
+                GroupingPadding = 0,
+                GroupingThreshold = 1
+            });
+
+            Assert.Equal(1, result.Count);
+            Assert.Equal(new Rectangle(1, 1, 5, 5), result[0]);
         }
     }
 }
