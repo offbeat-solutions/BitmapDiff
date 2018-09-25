@@ -4,7 +4,6 @@
 		<TargetFramework>net462</TargetFramework>
 		<PackageId>Offbeat.BitmapDiff</PackageId>
 		<VersionPrefix>0.1.0</VersionPrefix>
-		<VersionSuffix Condition="'$(PREVIEW_BUILD)' != ''">-preview-$(BUILD_NUMBER)</VersionSuffix>
 		<PackageProjectUrl></PackageProjectUrl>
 		<RepositoryUrl>https://github.com/offbeat-solutions/BitmapDiff</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>

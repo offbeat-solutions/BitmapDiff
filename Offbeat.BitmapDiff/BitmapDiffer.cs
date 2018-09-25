@@ -174,35 +174,4 @@ namespace Offbeat.BitmapDiff {
             return result;
         }
     }
-
-    public static class BitmapExtensions {
-        public static Rectangle GetBoundingRectangle(this Bitmap bitmap) {
-            return new Rectangle(0, 0, bitmap.Width, bitmap.Height);
-        }
-
-        public static BitmapData LockBits(this Bitmap bitmap, PixelFormat format) {
-            return bitmap.LockBits(bitmap.GetBoundingRectangle(), ImageLockMode.ReadOnly, format);
-        }
-
-        public static BitmapReadLock ReadLock(this Bitmap bitmap, PixelFormat format) {
-            return new BitmapReadLock(bitmap, format);
-        }
-    }
-
-    public class BitmapReadLock : IDisposable {
-        private readonly Bitmap source;
-
-        public BitmapData Data { get; }
-
-        public BitmapReadLock(Bitmap source, PixelFormat format) {
-            this.source = source;
-            Data = source.LockBits(format);
-        }
-
-
-        public void Dispose() {
-            source.UnlockBits(Data);
-        }
-    }
-
 }
